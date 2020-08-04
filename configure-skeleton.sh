@@ -33,7 +33,7 @@ folder_name=$(basename "$current_directory")
 package_name=$(ask_question "Package name" "$folder_name")
 
 # convert my-class-title to MyClassTitle - RODO: use to subsctitute ./src/*
-class_name=$(echo "$package_name" | sed 's/[-_]/ /g' | awk '{for(j=1;j<=NF;j++){ $j=toupper(substr($j,1,1)) substr($j,2) }}1' | sed 's/\s//g')
+class_name=$(echo "$package_name" | sed 's/[-_]/ /g' | awk '{for(j=1;j<=NF;j++){ $j=toupper(substr($j,1,1)) substr($j,2) }}1' | sed 's/[[:space:]]//g')
 
 package_description=$(ask_question "Package description" "")
 
