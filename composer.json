@@ -20,7 +20,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.16",
-        "phpunit/phpunit": "^9.0",
+        "phpunit/phpunit": "^9.3",
         "vimeo/psalm": "^3.11"
     },
     "autoload": {
