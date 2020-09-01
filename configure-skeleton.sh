@@ -46,7 +46,7 @@ echo -e "Author: $author_name ($author_username, $author_email)"
 echo -e "Package: $package_name <$package_description>"
 
 echo
-echo "This script will replace the above values in all files in the project directory and reset the git repository."
+echo "This script will replace the above values in all files in the project directory."
 if ! confirm "Modify files?" ; then
     $safe_exit 1
 fi
