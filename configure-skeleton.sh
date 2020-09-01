@@ -66,7 +66,7 @@ for file in $files ; do
     | sed "s/Skeleton/$class_name/g" \
     | sed "s/:vendor_name/$vendor_name_lower_case/g" \
     | sed "s/:package_description/$package_description/g" \
-    | sed "/^\*\*Note:\*\* Replace/d" \
+    | sed "/^\*\*Note:\*\* Run/d" \
     > "$temp_file"
     rm -f "$file"
     new_file=`echo $file | sed -e "s/Skeleton/${class_name}/g"`
