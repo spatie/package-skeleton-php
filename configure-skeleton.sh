@@ -52,7 +52,7 @@ if ! confirm "Modify files?" ; then
 fi
 
 echo
-files=$(grep -E -r -l -i ":author|:package|spatie|skeleton|:vendor_name" --exclude-dir=vendor ./*  | grep -v "$script_name")
+files=$(grep -E -r -l -i ":author|:package|spatie|skeleton|:vendor_name" --exclude-dir=vendor ./* ./.github/* | grep -v "$script_name")
 
 for file in $files ; do
     echo "Customising file $file"
