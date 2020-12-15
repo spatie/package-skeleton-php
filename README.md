@@ -26,14 +26,14 @@ composer require :vendor_name/:package_name
 
 ## Usage
 
-``` php
+```php
 $skeleton = new Spatie\Skeleton();
 echo $skeleton->echoPhrase('Hello, Spatie!');
 ```
 
 ## Testing
 
-``` bash
+```bash
 composer test
 ```
 
