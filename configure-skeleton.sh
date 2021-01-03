@@ -25,7 +25,8 @@ author_name=$(ask_question "Author name" "$git_name")
 git_email=$(git config user.email)
 author_email=$(ask_question "Author email" "$git_email")
 
-homepage_guess=${echo author_email | awk -F '@' '{print $NF}'//[[:blank:]]/}
+homepage_temp=$(echo $author_email | awk -F '@' '{print $NF}')
+homepage_guess=${homepage_temp//[[:blank:]]/}
 author_homepage=$(ask_question "Author homepage" "$homepage_guess")
 
 username_guess=${author_name//[[:blank:]]/}
