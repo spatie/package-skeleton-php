@@ -25,15 +25,18 @@ author_name=$(ask_question "Author name" "$git_name")
 git_email=$(git config user.email)
 author_email=$(ask_question "Author email" "$git_email")
 
+homepage_guess=${echo author_email | awk -F '@' '{print $NF}'//[[:blank:]]/}
+author_homepage=$(ask_question "Author homepage" "$homepage_guess")
+
 username_guess=${author_name//[[:blank:]]/}
 author_username=$(ask_question "Author username" "$username_guess")
 
 current_directory=$(pwd)
 folder_name=$(basename "$current_directory")
 
-vendor_name_unsantized=$(ask_question "Vendor name" "spatie")
+vendor_name_unsantized=$(ask_question "Vendor name" "$author_name")
 package_name=$(ask_question "Package name" "$folder_name")
-package_description=$(ask_question "Package description" "")
+package_description=$(ask_question "Package description" "$package_name")
 
 # convert my-class-title to MyClassTitle - RODO: use to subsctitute ./src/*
 class_name=$(echo "$package_name" | sed 's/[-_]/ /g' | awk '{for(j=1;j<=NF;j++){ $j=toupper(substr($j,1,1)) substr($j,2) }}1' | sed 's/[[:space:]]//g')
@@ -42,7 +45,7 @@ vendor_name_lower_case=`echo "$vendor_name_unsantized" | tr '[:upper:]' '[:lower
 vendor_name="$(tr '[:lower:]' '[:upper:]' <<< ${vendor_name_lower_case:0:1})${vendor_name_lower_case:1}"
 
 echo
-echo -e "Author: $author_name ($author_username, $author_email)"
+echo -e "Author: $author_name ($author_username, $author_email) - $author_homepage"
 echo -e "Package: $package_name <$package_description>"
 
 echo
@@ -61,6 +64,7 @@ for file in $files ; do
       sed "s/:author_name/$author_name/g" \
     | sed "s/:author_username/$author_username/g" \
     | sed "s/:author_email/$author_email/g" \
+    | sed "s/:author_homepage/$author_homepage/g" \
     | sed "s/:package_name/$package_name/g" \
     | sed "s/Spatie/$vendor_name/g" \
     | sed "s/Skeleton/$class_name/g" \
