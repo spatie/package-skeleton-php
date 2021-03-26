@@ -42,6 +42,7 @@ package_description=$(ask_question "Package description" "$package_name")
 # convert my-class-title to MyClassTitle - RODO: use to subsctitute ./src/*
 class_name=$(echo "$package_name" | sed 's/[-_]/ /g' | awk '{for(j=1;j<=NF;j++){ $j=toupper(substr($j,1,1)) substr($j,2) }}1' | sed 's/[[:space:]]//g')
 
+vendor_name_pascal_case=`echo "$vendor_name_unsanitized" | sed -r 's/(^|-)(\w)/\U\2/g'`
 vendor_name_lower_case=`echo "$vendor_name_unsantized" | tr '[:upper:]' '[:lower:]'`
 vendor_name="$(tr '[:lower:]' '[:upper:]' <<< ${vendor_name_lower_case:0:1})${vendor_name_lower_case:1}"
 
@@ -67,7 +68,7 @@ for file in $files ; do
     | sed "s/:author_email/$author_email/g" \
     | sed "s/:author_homepage/$author_homepage/g" \
     | sed "s/:package_name/$package_name/g" \
-    | sed "s/Spatie/$vendor_name/g" \
+    | sed "s/Spatie/$vendor_name_pascal_case/g" \
     | sed "s/Skeleton/$class_name/g" \
     | sed "s/:vendor_name/$vendor_name_lower_case/g" \
     | sed "s/:package_description/$package_description/g" \
