@@ -90,7 +90,7 @@ echo -e "Namespace : $VendorName\\$ClassName"
 echo -e "ClassName : $ClassName"
 echo -e "------"
 
-files=$(grep -E -r -l -i ":author|:vendor|:package|:short|spatie|skeleton" --exclude-dir=vendor ./* ./.github/* | grep -v "$script_name")
+files=$(grep -E -r -l -i ":author|:vendor|:package|:short|spatie|author@domain.com|vendor_slug|skeleton|Skeleton" --exclude-dir=vendor ./* ./.github/* | grep -v "$script_name")
 
 echo "This script will replace the above values in all relevant files in the project directory."
 
@@ -98,7 +98,8 @@ if ! confirm "Modify files?"; then
     $safe_exit 1
 fi
 
-grep -E -r -l -i ":author|:vendor|:package|VendorName|skeleton" --exclude-dir=vendor ./* ./.github/* \
+files_regex=":author|:vendor|:package|:short|spatie|author@domain.com|vendor_slug|skeleton|Skeleton"
+grep -E -r -l -i "$files_regex" --exclude-dir=vendor ./* ./.github/* \
 | grep -v "$script_name" \
 | while read -r file ; do
     new_file="$file"
