@@ -6,7 +6,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/vendor_slug/package_slug.svg?style=flat-square)](https://packagist.org/packages/vendor_slug/package_slug)
 
 [](delete) 1) manually replace `:author_name, :author_username, auhor@domain.com, :vendor_name, vendor_slug, Vendor Name, :package_name, package_slug, skeleton, Skeleton, :package_description` with their correct values
-[](delete) in `CHANGELOG.md, LICENSE.md, README.md, ExampleTest.php, ModelFactory.php, Skeleton.php, SkeletonCommand.php, SkeletonFacade.php, SkeletonServiceProvider.php, TestCase.php, composer.json, create_skeleton_table.php.stub`
+[](delete) in `CHANGELOG.md LICENSE.md README.md composer.json SkeletonClass.php ExampleTest.php FUNDING.yml config.yml SECURITY.md`
 [](delete) and delete `configure-skeleton.sh`
 
 [](delete) 2) You can also run `./configure-skeleton.sh` to do this automatically.
