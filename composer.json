@@ -10,7 +10,7 @@
     "authors": [
         {
             "name": ":author_name",
-            "email": ":author_email",
+            "email": "author@domain.com",
             "role": "Developer"
         }
     ],
@@ -25,12 +25,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Spatie\\Skeleton\\": "src"
+            "VendorName\\Skeleton\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Spatie\\Skeleton\\Tests\\": "tests"
+            "VendorName\\Skeleton\\Tests\\": "tests"
         }
     },
     "scripts": {
