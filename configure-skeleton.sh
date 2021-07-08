@@ -76,7 +76,7 @@ current_directory=$(pwd)
 folder_name=$(basename "$current_directory")
 
 package_name=$(ask_question "Package name" "$folder_name")
-package_slug=$(slugify "$package_name" "_")
+package_slug=$(slugify "$package_name" "-")
 
 ClassName=$(titlecase "$package_name")
 ClassName=$(ask_question "Class Name" "$ClassName")
@@ -90,7 +90,7 @@ echo -e "Namespace : $VendorName\\$ClassName"
 echo -e "ClassName : $ClassName"
 echo -e "------"
 
-files=$(grep -E -r -l -i ":author|:vendor|:package|:short|spatie|author@domain.com|vendor_slug|skeleton|Skeleton" --exclude-dir=vendor ./* ./.github/* | grep -v "$script_name")
+files=$(grep -E -r -l -i ":author|:vendor|:package|:short|spatie|skeleton" --exclude-dir=vendor ./* ./.github/* | grep -v "$script_name")
 
 echo "This script will replace the above values in all relevant files in the project directory."
 
@@ -98,29 +98,30 @@ if ! confirm "Modify files?"; then
     $safe_exit 1
 fi
 
-files_regex=":author|:vendor|:package|:short|spatie|author@domain.com|vendor_slug|skeleton|Skeleton"
-grep -E -r -l -i "$files_regex" --exclude-dir=vendor ./* ./.github/* \
+grep -E -r -l -i ":author|:vendor|:package|VendorName|skeleton|vendor_name|vendor_slug|author@domain.com" --exclude-dir=vendor ./* ./.github/* \
 | grep -v "$script_name" \
 | while read -r file ; do
     new_file="$file"
     new_file="${new_file//Skeleton/$ClassName}"
     new_file="${new_file//skeleton/$package_slug}"
     new_file="${new_file//laravel_/}"
+    new_file="${new_file//laravel-/}"
+
     echo "adapting file $file -> $new_file"
         temp_file="$file.temp"
         < "$file" \
-          sed "s/:author_name/$author_name/g" \
-        | sed "s/:author_username/$author_username/g" \
-        | sed "s/author@domain.com/$author_email/g" \
-        | sed "s/:vendor_name/$vendor_name/g" \
-        | sed "s/vendor_slug/$vendor_slug/g" \
-        | sed "s/VendorName/$VendorName/g" \
-        | sed "s/:package_name/$package_name/g" \
-        | sed "s/package_slug/$package_slug/g" \
-        | sed "s/skeleton/$package_slug/g" \
-        | sed "s/Skeleton/$ClassName/g" \
-        | sed "s/:package_description/$package_description/g" \
-        | sed "/^\[\]\(delete\) /d" \
+          sed "s#:author_name#$author_name#g" \
+        | sed "s#:author_username#$author_username#g" \
+        | sed "s#author@domain.com#$author_email#g" \
+        | sed "s#:vendor_name#$vendor_name#g" \
+        | sed "s#vendor_slug#$vendor_slug#g" \
+        | sed "s#VendorName#$VendorName#g" \
+        | sed "s#:package_name#$package_name#g" \
+        | sed "s#package_slug#$package_slug#g" \
+        | sed "s#skeleton#$package_slug#g" \
+        | sed "s#Skeleton#$ClassName#g" \
+        | sed "s#:package_description#$package_description#g" \
+        | sed "#^\[\]\(delete\) #d" \
         > "$temp_file"
         rm -f "$file"
         mv "$temp_file" "$new_file"
