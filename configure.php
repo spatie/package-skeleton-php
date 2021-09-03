@@ -125,8 +125,5 @@ foreach ($files as $file) {
     };
 }
 
-rename('./config/skeleton.php', "./config/{$packageSlug}.php");
-rename('./database/migrations/create_skeleton_tables.php.stub', "./database/migrations/create_{$packageSlug}_tables.php.stub");
-
 confirm('Execute `composer install` and run tests?') && run('composer install && composer test');
 confirm('Let this script delete itself?', true) && unlink(__FILE__);
