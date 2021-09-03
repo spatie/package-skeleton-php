@@ -84,7 +84,7 @@ $packageSlug = slugify($packageName);
 
 $className = title_case($packageName);
 $className = ask('Class name', $className);
-$description = ask('Package description', 'This is my package.');
+$description = ask('Package description', "This is my package {$packageSlug}");
 
 writeln('------');
 writeln("Author     : {$authorName} ({$authorUsername}, {$authorEmail})");
