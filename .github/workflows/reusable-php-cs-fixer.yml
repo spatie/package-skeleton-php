@@ -1,0 +1,30 @@
+name: Check & fix styling
+
+on:
+  workflow_call:
+    inputs:
+      file:
+        description: 'The name of the config file'
+        default: '.php-cs-fixer.dist.php'
+        required: false
+        type: string
+
+jobs:
+  php-cs-fixer:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Run PHP CS Fixer
+        uses: docker://oskarstark/php-cs-fixer-ga
+        with:
+          args: --config=${{ inputs.file }} --allow-risky=yes
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Fix styling
