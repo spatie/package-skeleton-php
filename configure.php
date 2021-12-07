@@ -60,6 +60,19 @@ function replace_in_file(string $file, array $replacements): void {
     );
 }
 
+function removeReadmeParagraphs(string $file): void {
+    $contents = file_get_contents($file);
+
+    file_put_contents(
+        $file,
+        preg_replace('/<!--delete-->.*<!--\/delete-->/s', '', $contents) ?: $contents
+    );
+}
+
+function determineSeparator(string $path): string {
+    return str_replace('/', DIRECTORY_SEPARATOR, $path);
+}
+
 function replaceForWindows(): array {
     return preg_split('/\\r\\n|\\r|\\n/', run('dir /S /B * | findstr /v /i .git\ | findstr /v /i vendor | findstr /v /i '.basename(__FILE__).' | findstr /r /i /M /F:/ ":author :vendor :package VendorName skeleton vendor_name vendor_slug author@domain.com"'));
 }
@@ -67,7 +80,6 @@ function replaceForWindows(): array {
 function replaceForAllOtherOSes(): array {
     return explode(PHP_EOL, run('grep -E -r -l -i ":author|:vendor|:package|VendorName|skeleton|vendor_name|vendor_slug|author@domain.com" --exclude-dir=vendor ./* ./.github/* | grep -v ' . basename(__FILE__)));
 }
-
 
 $gitName = run('git config user.name');
 $authorName = ask('Author name', $gitName);
@@ -126,7 +138,8 @@ foreach ($files as $file) {
     ]);
 
     match (true) {
-        str_contains($file, 'src'.DIRECTORY_SEPARATOR.'SkeletonClass.php') => rename($file, '.'.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'' . $className . 'Class.php'),
+        str_contains($file, determineSeparator('src/SkeletonClass.php')) => rename($file, determineSeparator('./src/' . $className . 'Class.php')),
+        str_contains($file, 'README.md') => removeReadmeParagraphs($file),
         default => [],
     };
 
