@@ -60,6 +60,27 @@ function replace_in_file(string $file, array $replacements): void {
     );
 }
 
+function removeReadmeParagraphs(string $file): void {
+    $contents = file_get_contents($file);
+
+    file_put_contents(
+        $file,
+        preg_replace('/<!--delete-->.*<!--\/delete-->/s', '', $contents) ?: $contents
+    );
+}
+
+function determineSeparator(string $path): string {
+    return str_replace('/', DIRECTORY_SEPARATOR, $path);
+}
+
+function replaceForWindows(): array {
+    return preg_split('/\\r\\n|\\r|\\n/', run('dir /S /B * | findstr /v /i .git\ | findstr /v /i vendor | findstr /v /i '.basename(__FILE__).' | findstr /r /i /M /F:/ ":author :vendor :package VendorName skeleton vendor_name vendor_slug author@domain.com"'));
+}
+
+function replaceForAllOtherOSes(): array {
+    return explode(PHP_EOL, run('grep -E -r -l -i ":author|:vendor|:package|VendorName|skeleton|vendor_name|vendor_slug|author@domain.com" --exclude-dir=vendor ./* ./.github/* | grep -v ' . basename(__FILE__)));
+}
+
 $gitName = run('git config user.name');
 $authorName = ask('Author name', $gitName);
 
@@ -100,7 +121,7 @@ if (! confirm('Modify files?', true)) {
     exit(1);
 }
 
-$files = explode(PHP_EOL, run('grep -E -r -l -i ":author|:vendor|:package|VendorName|skeleton|vendor_name|vendor_slug|author@domain.com" --exclude-dir=vendor ./* ./.github/* | grep -v ' . basename(__FILE__)));
+$files = (str_starts_with(strtoupper(PHP_OS), 'WIN') ? replaceForWindows() : replaceForAllOtherOSes());
 
 foreach ($files as $file) {
     replace_in_file($file, [
@@ -117,12 +138,11 @@ foreach ($files as $file) {
     ]);
 
     match (true) {
-        str_contains($file, 'src/Skeleton.php') => rename($file, './src/' . $className . '.php'),
-        str_contains($file, 'src/SkeletonServiceProvider.php') => rename($file, './src/' . $className . 'ServiceProvider.php'),
-        str_contains($file, 'src/SkeletonFacade.php') => rename($file, './src/' . $className . 'Facade.php'),
-        str_contains($file, 'src/Commands/SkeletonCommand.php') => rename($file, './src/Commands/' . $className . 'Command.php'),
+        str_contains($file, determineSeparator('src/SkeletonClass.php')) => rename($file, determineSeparator('./src/' . $className . 'Class.php')),
+        str_contains($file, 'README.md') => removeReadmeParagraphs($file),
         default => [],
     };
+
 }
 
 confirm('Execute `composer install` and run tests?') && run('composer install && composer test');
