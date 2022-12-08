@@ -169,31 +169,31 @@ function setupTestingLibrary(string $testingLibrary): void
     }
 }
 
-//$gitName = run('git config user.name');
-//$authorName = ask('Author name', $gitName);
-//
-//$gitEmail = run('git config user.email');
-//$authorEmail = ask('Author email', $gitEmail);
-//
-//$usernameGuess = explode(':', run('git config remote.origin.url'))[1];
-//$usernameGuess = dirname($usernameGuess);
-//$usernameGuess = basename($usernameGuess);
-//$authorUsername = ask('Author username', $usernameGuess);
-//
-//$vendorName = ask('Vendor name', $authorUsername);
-//$vendorSlug = slugify($vendorName);
-//$vendorNamespace = ucwords($vendorName);
-//$vendorNamespace = ask('Vendor namespace', $vendorNamespace);
-//
-//$currentDirectory = getcwd();
-//$folderName = basename($currentDirectory);
-//
-//$packageName = ask('Package name', $folderName);
-//$packageSlug = slugify($packageName);
-//
-//$className = title_case($packageName);
-//$className = ask('Class name', $className);
-//$description = ask('Package description', "This is my package {$packageSlug}");
+$gitName = run('git config user.name');
+$authorName = ask('Author name', $gitName);
+
+$gitEmail = run('git config user.email');
+$authorEmail = ask('Author email', $gitEmail);
+
+$usernameGuess = explode(':', run('git config remote.origin.url'))[1];
+$usernameGuess = dirname($usernameGuess);
+$usernameGuess = basename($usernameGuess);
+$authorUsername = ask('Author username', $usernameGuess);
+
+$vendorName = ask('Vendor name', $authorUsername);
+$vendorSlug = slugify($vendorName);
+$vendorNamespace = ucwords($vendorName);
+$vendorNamespace = ask('Vendor namespace', $vendorNamespace);
+
+$currentDirectory = getcwd();
+$folderName = basename($currentDirectory);
+
+$packageName = ask('Package name', $folderName);
+$packageSlug = slugify($packageName);
+
+$className = title_case($packageName);
+$className = ask('Class name', $className);
+$description = ask('Package description', "This is my package {$packageSlug}");
 
 $testingLibrary = askWithOptions(
     'Which testing library do you want to use?',
@@ -208,24 +208,20 @@ $codeStyleLibrary = askWithOptions(
 );
 
 writeln('------');
-//writeln("Author     : {$authorName} ({$authorUsername}, {$authorEmail})");
-//writeln("Vendor     : {$vendorName} ({$vendorSlug})");
-//writeln("Package    : {$packageSlug} <{$description}>");
-//writeln("Namespace  : {$vendorNamespace}\\{$className}");
-//writeln("Class name : {$className}");
+writeln("Author     : {$authorName} ({$authorUsername}, {$authorEmail})");
+writeln("Vendor     : {$vendorName} ({$vendorSlug})");
+writeln("Package    : {$packageSlug} <{$description}>");
+writeln("Namespace  : {$vendorNamespace}\\{$className}");
+writeln("Class name : {$className}");
 writeln("Testing library : {$testingLibrary}");
 writeln("Code style library : {$codeStyleLibrary}");
 writeln('------');
 
-//writeln('This script will replace the above values in all relevant files in the project directory.');
-//
-//if (! confirm('Modify files?', true)) {
-//    exit(1);
-//}
+writeln('This script will replace the above values in all relevant files in the project directory.');
 
-setupTestingLibrary($testingLibrary);
-
-die('stop');
+if (! confirm('Modify files?', true)) {
+    exit(1);
+}
 
 $files = (str_starts_with(strtoupper(PHP_OS), 'WIN') ? replaceForWindows() : replaceForAllOtherOSes());
 
@@ -249,6 +245,9 @@ foreach ($files as $file) {
         default => [],
     };
 }
+
+setupTestingLibrary($testingLibrary);
+// TODO setupFormatter
 
 confirm('Execute `composer install` and run tests?') && run('composer install && composer test');
 
