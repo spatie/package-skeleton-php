@@ -12,6 +12,36 @@ function ask(string $question, string $default = ''): string
     return $answer;
 }
 
+function askWithOptions(string $question, array $options, string $default = ''): string
+{
+    $suggestions = implode('/', array_map(
+        fn (string $option) => $option === $default ? strtoupper($option) : $option,
+        $options,
+    ));
+
+    $answer = ask("{$question} ({$suggestions})");
+
+    $validOptions = implode(', ', $options);
+
+    while (! in_array($answer, $options)) {
+        if ($default && $answer === '') {
+            $answer = $default;
+
+            break;
+        }
+
+        writeln(PHP_EOL."Please pick one of the following options: {$validOptions}");
+
+        $answer = ask("{$question} ({$suggestions})");
+    }
+
+    if (! $answer) {
+        $answer = $default;
+    }
+
+    return $answer;
+}
+
 function confirm(string $question, bool $default = false): bool
 {
     $answer = ask($question.' ('.($default ? 'Y/n' : 'y/N').')');
@@ -93,6 +123,85 @@ function replaceForAllOtherOSes(): array
     return explode(PHP_EOL, run('grep -E -r -l -i ":author|:vendor|:package|VendorName|skeleton|vendor_name|vendor_slug|author@domain.com" --exclude-dir=vendor ./* ./.github/* | grep -v '.basename(__FILE__)));
 }
 
+function setupTestingLibrary(string $testingLibrary): void
+{
+    if ($testingLibrary === 'pest') {
+        unlink(__DIR__.'/tests/ExampleTestPhpunit.php');
+        unlink(__DIR__.'/.github/workflows/run-tests-phpunit.yml');
+
+        rename(
+            from: __DIR__.'/tests/ExampleTestPest.php',
+            to: __DIR__.'/tests/ExampleTest.php'
+        );
+
+        rename(
+            from: __DIR__.'/.github/workflows/run-tests-pest.yml',
+            to: __DIR__.'/.github/workflows/run-tests.yml'
+        );
+
+        replace_in_file(__DIR__.'/composer.json', [
+            ':require_dev_testing' => '"pestphp/pest": "^1.20"',
+            ':scripts_testing' => '"test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage"',
+            ':plugins_testing' => '"pestphp/pest-plugin": true',
+        ]);
+    } elseif ($testingLibrary === 'phpunit') {
+        unlink(__DIR__.'/tests/ExampleTestPest.php');
+        unlink(__DIR__.'/tests/Pest.php');
+        unlink(__DIR__.'/.github/workflows/run-tests-pest.yml');
+
+        rename(
+            from: __DIR__.'/tests/ExampleTestPhpunit.php',
+            to: __DIR__.'/tests/ExampleTest.php'
+        );
+
+        rename(
+            from: __DIR__.'/.github/workflows/run-tests-phpunit.yml',
+            to: __DIR__.'/.github/workflows/run-tests.yml'
+        );
+
+        replace_in_file(__DIR__.'/composer.json', [
+            ':require_dev_testing' => '"phpunit/phpunit": "^9.5"',
+            ':scripts_testing' => '"test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage"',
+            ':plugins_testing,' => '', // We need to remove the comma here as well, since there's nothign to add
+        ]);
+    }
+}
+
+function setupCodeStyleLibrary(string $codeStyleLibrary): void
+{
+    if ($codeStyleLibrary === 'pint') {
+        unlink(__DIR__.'/.github/workflows/fix-php-code-style-issues-cs-fixer.yml');
+
+        rename(
+            from: __DIR__.'/.github/workflows/fix-php-code-style-issues-pint.yml',
+            to: __DIR__.'/.github/workflows/fix-php-code-style-issues.yml'
+        );
+
+        replace_in_file(__DIR__.'/composer.json', [
+            ':require_dev_codestyle' => '"laravel/pint": "^1.2"',
+            ':scripts_codestyle' => '"format": "vendor/bin/pint"',
+            ':plugins_testing' => '',
+        ]);
+
+        unlink(__DIR__.'/.php-cs-fixer.dist.php');
+    } elseif ($codeStyleLibrary === 'cs fixer') {
+        unlink(__DIR__.'/.github/workflows/fix-php-code-style-issues-pint.yml');
+
+        rename(
+            from: __DIR__.'/.github/workflows/fix-php-code-style-issues-cs-fixer.yml',
+            to: __DIR__.'/.github/workflows/fix-php-code-style-issues.yml'
+        );
+
+        replace_in_file(__DIR__.'/composer.json', [
+            ':require_dev_codestyle' => '"friendsofphp/php-cs-fixer": "^3.13"',
+            ':scripts_codestyle' => '"format": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --allow-risky=yes"',
+            ':plugins_testing' => '',
+        ]);
+    }
+}
+
 $gitName = run('git config user.name');
 $authorName = ask('Author name', $gitName);
 
@@ -119,12 +228,26 @@ $className = title_case($packageName);
 $className = ask('Class name', $className);
 $description = ask('Package description', "This is my package {$packageSlug}");
 
+$testingLibrary = askWithOptions(
+    'Which testing library do you want to use?',
+    ['pest', 'phpunit'],
+    'pest',
+);
+
+$codeStyleLibrary = askWithOptions(
+    'Which code style library do you want to use?',
+    ['pint', 'cs fixer'],
+    'pint',
+);
+
 writeln('------');
 writeln("Author     : {$authorName} ({$authorUsername}, {$authorEmail})");
 writeln("Vendor     : {$vendorName} ({$vendorSlug})");
 writeln("Package    : {$packageSlug} <{$description}>");
 writeln("Namespace  : {$vendorNamespace}\\{$className}");
 writeln("Class name : {$className}");
+writeln("Testing library : {$testingLibrary}");
+writeln("Code style library : {$codeStyleLibrary}");
 writeln('------');
 
 writeln('This script will replace the above values in all relevant files in the project directory.');
@@ -155,6 +278,9 @@ foreach ($files as $file) {
         default => [],
     };
 }
+
+setupTestingLibrary($testingLibrary);
+setupCodeStyleLibrary($codeStyleLibrary);
 
 confirm('Execute `composer install` and run tests?') && run('composer install && composer test');
 
