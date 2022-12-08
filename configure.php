@@ -138,6 +138,13 @@ function setupTestingLibrary(string $testingLibrary): void
             from: __DIR__ . '/.github/workflows/run-tests-pest.yml',
             to: __DIR__ . '/.github/workflows/run-tests.yml'
         );
+
+        replace_in_file(__DIR__ . '/composer.json', [
+            ':require_dev_testing' => '"pestphp/pest": "^1.20",',
+            ':scripts_testing' => '"test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",',
+            ':plugins_testing' => '"pestphp/pest-plugin": true,',
+        ]);
     } elseif ($testingLibrary === 'phpunit') {
         unlink(__DIR__ . '/tests/ExampleTestPest.php');
         unlink(__DIR__ . '/tests/Pest.php');
@@ -152,6 +159,13 @@ function setupTestingLibrary(string $testingLibrary): void
             from: __DIR__ . '/.github/workflows/run-tests-phpunit.yml',
             to: __DIR__ . '/.github/workflows/run-tests.yml'
         );
+
+        replace_in_file(__DIR__ . '/composer.json', [
+            ':require_dev_testing' => '"phpunit/phpunit": "^9.5"',
+            ':scripts_testing' => '"test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage",',
+            ':plugins_testing' => '',
+        ]);
     }
 }
 
@@ -203,11 +217,15 @@ writeln("Testing library : {$testingLibrary}");
 writeln("Code style library : {$codeStyleLibrary}");
 writeln('------');
 
-writeln('This script will replace the above values in all relevant files in the project directory.');
+//writeln('This script will replace the above values in all relevant files in the project directory.');
+//
+//if (! confirm('Modify files?', true)) {
+//    exit(1);
+//}
 
-if (! confirm('Modify files?', true)) {
-    exit(1);
-}
+setupTestingLibrary($testingLibrary);
+
+die('stop');
 
 $files = (str_starts_with(strtoupper(PHP_OS), 'WIN') ? replaceForWindows() : replaceForAllOtherOSes());
 
