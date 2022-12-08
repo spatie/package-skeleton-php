@@ -169,7 +169,8 @@ function setupTestingLibrary(string $testingLibrary): void
     }
 }
 
-function setupCodeStyleLibrary(string $codeStyleLibrary): void {
+function setupCodeStyleLibrary(string $codeStyleLibrary): void
+{
     if ($codeStyleLibrary === 'pint') {
         unlink(__DIR__.'/.github/workflows/fix-php-code-style-issues-cs-fixer.yml');
 
@@ -184,8 +185,8 @@ function setupCodeStyleLibrary(string $codeStyleLibrary): void {
             ':plugins_testing' => '',
         ]);
 
-        unlink(__DIR__ . '/.php-cs-fixer.dist.php');
-    } elseif($codeStyleLibrary === 'cs fixer') {
+        unlink(__DIR__.'/.php-cs-fixer.dist.php');
+    } elseif ($codeStyleLibrary === 'cs fixer') {
         unlink(__DIR__.'/.github/workflows/fix-php-code-style-issues-pint.yml');
 
         rename(
