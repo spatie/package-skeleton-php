@@ -15,7 +15,7 @@ function ask(string $question, string $default = ''): string
 function askWithOptions(string $question, array $options, string $default = ''): string
 {
     $suggestions = implode('/', array_map(
-        fn(string $option) => $option === $default ? strtoupper($option) : $option,
+        fn (string $option) => $option === $default ? strtoupper($option) : $option,
         $options,
     ));
 
@@ -30,7 +30,7 @@ function askWithOptions(string $question, array $options, string $default = ''):
             break;
         }
 
-        writeln(PHP_EOL . "Please pick one of the following options: {$validOptions}");
+        writeln(PHP_EOL."Please pick one of the following options: {$validOptions}");
 
         $answer = ask("{$question} ({$suggestions})");
     }
@@ -126,41 +126,41 @@ function replaceForAllOtherOSes(): array
 function setupTestingLibrary(string $testingLibrary): void
 {
     if ($testingLibrary === 'pest') {
-        unlink(__DIR__ . '/tests/ExampleTestPhpunit.php');
-        unlink(__DIR__ . '/.github/workflows/run-tests-phpunit.yml');
+        unlink(__DIR__.'/tests/ExampleTestPhpunit.php');
+        unlink(__DIR__.'/.github/workflows/run-tests-phpunit.yml');
 
         rename(
-            from: __DIR__ . '/tests/ExampleTestPest.php',
-            to: __DIR__ . '/tests/ExampleTest.php'
+            from: __DIR__.'/tests/ExampleTestPest.php',
+            to: __DIR__.'/tests/ExampleTest.php'
         );
 
         rename(
-            from: __DIR__ . '/.github/workflows/run-tests-pest.yml',
-            to: __DIR__ . '/.github/workflows/run-tests.yml'
+            from: __DIR__.'/.github/workflows/run-tests-pest.yml',
+            to: __DIR__.'/.github/workflows/run-tests.yml'
         );
 
-        replace_in_file(__DIR__ . '/composer.json', [
+        replace_in_file(__DIR__.'/composer.json', [
             ':require_dev_testing' => '"pestphp/pest": "^1.20",',
             ':scripts_testing' => '"test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",',
             ':plugins_testing' => '"pestphp/pest-plugin": true,',
         ]);
     } elseif ($testingLibrary === 'phpunit') {
-        unlink(__DIR__ . '/tests/ExampleTestPest.php');
-        unlink(__DIR__ . '/tests/Pest.php');
-        unlink(__DIR__ . '/.github/workflows/run-tests-pest.yml');
+        unlink(__DIR__.'/tests/ExampleTestPest.php');
+        unlink(__DIR__.'/tests/Pest.php');
+        unlink(__DIR__.'/.github/workflows/run-tests-pest.yml');
 
         rename(
-            from: __DIR__ . '/tests/ExampleTestPhpunit.php',
-            to: __DIR__ . '/tests/ExampleTest.php'
+            from: __DIR__.'/tests/ExampleTestPhpunit.php',
+            to: __DIR__.'/tests/ExampleTest.php'
         );
 
         rename(
-            from: __DIR__ . '/.github/workflows/run-tests-phpunit.yml',
-            to: __DIR__ . '/.github/workflows/run-tests.yml'
+            from: __DIR__.'/.github/workflows/run-tests-phpunit.yml',
+            to: __DIR__.'/.github/workflows/run-tests.yml'
         );
 
-        replace_in_file(__DIR__ . '/composer.json', [
+        replace_in_file(__DIR__.'/composer.json', [
             ':require_dev_testing' => '"phpunit/phpunit": "^9.5"',
             ':scripts_testing' => '"test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage",',
