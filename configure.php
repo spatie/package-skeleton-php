@@ -140,10 +140,10 @@ function setupTestingLibrary(string $testingLibrary): void
         );
 
         replace_in_file(__DIR__.'/composer.json', [
-            ':require_dev_testing' => '"pestphp/pest": "^1.20",',
+            ':require_dev_testing' => '"pestphp/pest": "^1.20"',
             ':scripts_testing' => '"test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage",',
-            ':plugins_testing' => '"pestphp/pest-plugin": true,',
+        "test-coverage": "vendor/bin/pest --coverage"',
+            ':plugins_testing' => '"pestphp/pest-plugin": true',
         ]);
     } elseif ($testingLibrary === 'phpunit') {
         unlink(__DIR__.'/tests/ExampleTestPest.php');
@@ -164,6 +164,38 @@ function setupTestingLibrary(string $testingLibrary): void
             ':require_dev_testing' => '"phpunit/phpunit": "^9.5"',
             ':scripts_testing' => '"test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage",',
+            ':plugins_testing' => '',
+        ]);
+    }
+}
+
+function setupCodeStyleLibrary(string $codeStyleLibrary) {
+    if ($codeStyleLibrary === 'pint') {
+        unlink(__DIR__.'/.github/workflows/fix-php-code-style-issues-cs-fixer.yml');
+
+        rename(
+            from: __DIR__.'/.github/workflows/fix-php-code-style-issues-pint.yml',
+            to: __DIR__.'/.github/workflows/fix-php-code-style-issues.yml'
+        );
+
+        replace_in_file(__DIR__.'/composer.json', [
+            ':require_dev_testing' => '"laravel/pint": "^1.2"',
+            ':scripts_codestyle' => '"format": "vendor/bin/pint"',
+            ':plugins_testing' => '',
+        ]);
+
+        unlink(__DIR__ . '/.php-cs-fixer.dist.php');
+    } elseif($codeStyleLibrary === 'cs fixer') {
+        unlink(__DIR__.'/.github/workflows/fix-php-code-style-issues-pint.yml');
+
+        rename(
+            from: __DIR__.'/.github/workflows/fix-php-code-style-issues-cs-fixer.yml',
+            to: __DIR__.'/.github/workflows/fix-php-code-style-issues.yml'
+        );
+
+        replace_in_file(__DIR__.'/composer.json', [
+            ':require_dev_testing' => '"friendsofphp/php-cs-fixer": "^3.13"',
+            ':scripts_codestyle' => '"format": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --allow-risky=yes"',
             ':plugins_testing' => '',
         ]);
     }
@@ -247,7 +279,7 @@ foreach ($files as $file) {
 }
 
 setupTestingLibrary($testingLibrary);
-// TODO setupFormatter
+setupCodeStyleLibrary($codeStyleLibrary);
 
 confirm('Execute `composer install` and run tests?') && run('composer install && composer test');
 

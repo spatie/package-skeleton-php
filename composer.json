@@ -18,8 +18,8 @@
         "php": "^8.1"
     },
     "require-dev": {
-        :require_dev_testing
-        "laravel/pint": "^1.2",
+        :require_dev_testing,
+        :require_dev_codestyle,
         "spatie/ray": "^1.28"
     },
     "autoload": {
@@ -33,13 +33,13 @@
         }
     },
     "scripts": {
-        :scripts_testing
-        "format": "vendor/bin/pint"
+        :scripts_testing,
+        :scripts_codestyle
     },
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            :plugins_testing
+            :plugins_testing,
             "phpstan/extension-installer": true
         }
     },
