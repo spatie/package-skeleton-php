@@ -163,8 +163,8 @@ function setupTestingLibrary(string $testingLibrary): void
         replace_in_file(__DIR__.'/composer.json', [
             ':require_dev_testing' => '"phpunit/phpunit": "^9.5"',
             ':scripts_testing' => '"test": "vendor/bin/phpunit",
-        "test-coverage": "vendor/bin/phpunit --coverage",',
-            ':plugins_testing' => '',
+        "test-coverage": "vendor/bin/phpunit --coverage"',
+            ':plugins_testing,' => '', // We need to remove the comma here as well, since there's nothign to add
         ]);
     }
 }
