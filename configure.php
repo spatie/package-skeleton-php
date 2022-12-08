@@ -169,7 +169,7 @@ function setupTestingLibrary(string $testingLibrary): void
     }
 }
 
-function setupCodeStyleLibrary(string $codeStyleLibrary) {
+function setupCodeStyleLibrary(string $codeStyleLibrary): void {
     if ($codeStyleLibrary === 'pint') {
         unlink(__DIR__.'/.github/workflows/fix-php-code-style-issues-cs-fixer.yml');
 
@@ -201,31 +201,31 @@ function setupCodeStyleLibrary(string $codeStyleLibrary) {
     }
 }
 
-//$gitName = run('git config user.name');
-//$authorName = ask('Author name', $gitName);
-//
-//$gitEmail = run('git config user.email');
-//$authorEmail = ask('Author email', $gitEmail);
-//
-//$usernameGuess = explode(':', run('git config remote.origin.url'))[1];
-//$usernameGuess = dirname($usernameGuess);
-//$usernameGuess = basename($usernameGuess);
-//$authorUsername = ask('Author username', $usernameGuess);
-//
-//$vendorName = ask('Vendor name', $authorUsername);
-//$vendorSlug = slugify($vendorName);
-//$vendorNamespace = ucwords($vendorName);
-//$vendorNamespace = ask('Vendor namespace', $vendorNamespace);
-//
-//$currentDirectory = getcwd();
-//$folderName = basename($currentDirectory);
-//
-//$packageName = ask('Package name', $folderName);
-//$packageSlug = slugify($packageName);
-//
-//$className = title_case($packageName);
-//$className = ask('Class name', $className);
-//$description = ask('Package description', "This is my package {$packageSlug}");
+$gitName = run('git config user.name');
+$authorName = ask('Author name', $gitName);
+
+$gitEmail = run('git config user.email');
+$authorEmail = ask('Author email', $gitEmail);
+
+$usernameGuess = explode(':', run('git config remote.origin.url'))[1];
+$usernameGuess = dirname($usernameGuess);
+$usernameGuess = basename($usernameGuess);
+$authorUsername = ask('Author username', $usernameGuess);
+
+$vendorName = ask('Vendor name', $authorUsername);
+$vendorSlug = slugify($vendorName);
+$vendorNamespace = ucwords($vendorName);
+$vendorNamespace = ask('Vendor namespace', $vendorNamespace);
+
+$currentDirectory = getcwd();
+$folderName = basename($currentDirectory);
+
+$packageName = ask('Package name', $folderName);
+$packageSlug = slugify($packageName);
+
+$className = title_case($packageName);
+$className = ask('Class name', $className);
+$description = ask('Package description', "This is my package {$packageSlug}");
 
 $testingLibrary = askWithOptions(
     'Which testing library do you want to use?',
@@ -240,47 +240,47 @@ $codeStyleLibrary = askWithOptions(
 );
 
 writeln('------');
-//writeln("Author     : {$authorName} ({$authorUsername}, {$authorEmail})");
-//writeln("Vendor     : {$vendorName} ({$vendorSlug})");
-//writeln("Package    : {$packageSlug} <{$description}>");
-//writeln("Namespace  : {$vendorNamespace}\\{$className}");
-//writeln("Class name : {$className}");
+writeln("Author     : {$authorName} ({$authorUsername}, {$authorEmail})");
+writeln("Vendor     : {$vendorName} ({$vendorSlug})");
+writeln("Package    : {$packageSlug} <{$description}>");
+writeln("Namespace  : {$vendorNamespace}\\{$className}");
+writeln("Class name : {$className}");
 writeln("Testing library : {$testingLibrary}");
 writeln("Code style library : {$codeStyleLibrary}");
 writeln('------');
 
 writeln('This script will replace the above values in all relevant files in the project directory.');
 
-//if (! confirm('Modify files?', true)) {
-//    exit(1);
-//}
-//
-//$files = (str_starts_with(strtoupper(PHP_OS), 'WIN') ? replaceForWindows() : replaceForAllOtherOSes());
-//
-//foreach ($files as $file) {
-//    replace_in_file($file, [
-//        ':author_name' => $authorName,
-//        ':author_username' => $authorUsername,
-//        'author@domain.com' => $authorEmail,
-//        ':vendor_name' => $vendorName,
-//        ':vendor_slug' => $vendorSlug,
-//        'VendorName' => $vendorNamespace,
-//        ':package_name' => $packageName,
-//        ':package_slug' => $packageSlug,
-//        'Skeleton' => $className,
-//        ':package_description' => $description,
-//    ]);
-//
-//    match (true) {
-//        str_contains($file, determineSeparator('src/SkeletonClass.php')) => rename($file, determineSeparator('./src/'.$className.'Class.php')),
-//        str_contains($file, 'README.md') => removeReadmeParagraphs($file),
-//        default => [],
-//    };
-//}
+if (! confirm('Modify files?', true)) {
+    exit(1);
+}
+
+$files = (str_starts_with(strtoupper(PHP_OS), 'WIN') ? replaceForWindows() : replaceForAllOtherOSes());
+
+foreach ($files as $file) {
+    replace_in_file($file, [
+        ':author_name' => $authorName,
+        ':author_username' => $authorUsername,
+        'author@domain.com' => $authorEmail,
+        ':vendor_name' => $vendorName,
+        ':vendor_slug' => $vendorSlug,
+        'VendorName' => $vendorNamespace,
+        ':package_name' => $packageName,
+        ':package_slug' => $packageSlug,
+        'Skeleton' => $className,
+        ':package_description' => $description,
+    ]);
+
+    match (true) {
+        str_contains($file, determineSeparator('src/SkeletonClass.php')) => rename($file, determineSeparator('./src/'.$className.'Class.php')),
+        str_contains($file, 'README.md') => removeReadmeParagraphs($file),
+        default => [],
+    };
+}
 
 setupTestingLibrary($testingLibrary);
 setupCodeStyleLibrary($codeStyleLibrary);
 
-//confirm('Execute `composer install` and run tests?') && run('composer install && composer test');
-//
-//confirm('Let this script delete itself?', true) && unlink(__FILE__);
+confirm('Execute `composer install` and run tests?') && run('composer install && composer test');
+
+confirm('Let this script delete itself?', true) && unlink(__FILE__);
