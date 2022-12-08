@@ -12,6 +12,36 @@ function ask(string $question, string $default = ''): string
     return $answer;
 }
 
+function askWithOptions(string $question, array $options, string $default = ''): string
+{
+    $suggestions = implode('/', array_map(
+        fn(string $option) => $option === $default ? strtoupper($option) : $option,
+        $options,
+    ));
+
+    $answer = ask("{$question} ({$suggestions})");
+
+    $validOptions = implode(', ', $options);
+
+    while (! in_array($answer, $options)) {
+        if ($default && $answer === '') {
+            $answer = $default;
+
+            break;
+        }
+
+        writeln(PHP_EOL . "Please pick one of the following options: {$validOptions}");
+
+        $answer = ask("{$question} ({$suggestions})");
+    }
+
+    if (! $answer) {
+        $answer = $default;
+    }
+
+    return $answer;
+}
+
 function confirm(string $question, bool $default = false): bool
 {
     $answer = ask($question.' ('.($default ? 'Y/n' : 'y/N').')');
@@ -93,38 +123,84 @@ function replaceForAllOtherOSes(): array
     return explode(PHP_EOL, run('grep -E -r -l -i ":author|:vendor|:package|VendorName|skeleton|vendor_name|vendor_slug|author@domain.com" --exclude-dir=vendor ./* ./.github/* | grep -v '.basename(__FILE__)));
 }
 
-$gitName = run('git config user.name');
-$authorName = ask('Author name', $gitName);
+function setupTestingLibrary(string $testingLibrary): void
+{
+    if ($testingLibrary === 'pest') {
+        unlink(__DIR__ . '/tests/ExampleTestPhpunit.php');
+        unlink(__DIR__ . '/.github/workflows/run-tests-phpunit.yml');
 
-$gitEmail = run('git config user.email');
-$authorEmail = ask('Author email', $gitEmail);
+        rename(
+            from: __DIR__ . '/tests/ExampleTestPest.php',
+            to: __DIR__ . '/tests/ExampleTest.php'
+        );
 
-$usernameGuess = explode(':', run('git config remote.origin.url'))[1];
-$usernameGuess = dirname($usernameGuess);
-$usernameGuess = basename($usernameGuess);
-$authorUsername = ask('Author username', $usernameGuess);
+        rename(
+            from: __DIR__ . '/.github/workflows/run-tests-pest.yml',
+            to: __DIR__ . '/.github/workflows/run-tests.yml'
+        );
+    } elseif ($testingLibrary === 'phpunit') {
+        unlink(__DIR__ . '/tests/ExampleTestPest.php');
+        unlink(__DIR__ . '/tests/Pest.php');
+        unlink(__DIR__ . '/.github/workflows/run-tests-pest.yml');
 
-$vendorName = ask('Vendor name', $authorUsername);
-$vendorSlug = slugify($vendorName);
-$vendorNamespace = ucwords($vendorName);
-$vendorNamespace = ask('Vendor namespace', $vendorNamespace);
+        rename(
+            from: __DIR__ . '/tests/ExampleTestPhpunit.php',
+            to: __DIR__ . '/tests/ExampleTest.php'
+        );
 
-$currentDirectory = getcwd();
-$folderName = basename($currentDirectory);
+        rename(
+            from: __DIR__ . '/.github/workflows/run-tests-phpunit.yml',
+            to: __DIR__ . '/.github/workflows/run-tests.yml'
+        );
+    }
+}
 
-$packageName = ask('Package name', $folderName);
-$packageSlug = slugify($packageName);
+//$gitName = run('git config user.name');
+//$authorName = ask('Author name', $gitName);
+//
+//$gitEmail = run('git config user.email');
+//$authorEmail = ask('Author email', $gitEmail);
+//
+//$usernameGuess = explode(':', run('git config remote.origin.url'))[1];
+//$usernameGuess = dirname($usernameGuess);
+//$usernameGuess = basename($usernameGuess);
+//$authorUsername = ask('Author username', $usernameGuess);
+//
+//$vendorName = ask('Vendor name', $authorUsername);
+//$vendorSlug = slugify($vendorName);
+//$vendorNamespace = ucwords($vendorName);
+//$vendorNamespace = ask('Vendor namespace', $vendorNamespace);
+//
+//$currentDirectory = getcwd();
+//$folderName = basename($currentDirectory);
+//
+//$packageName = ask('Package name', $folderName);
+//$packageSlug = slugify($packageName);
+//
+//$className = title_case($packageName);
+//$className = ask('Class name', $className);
+//$description = ask('Package description', "This is my package {$packageSlug}");
 
-$className = title_case($packageName);
-$className = ask('Class name', $className);
-$description = ask('Package description', "This is my package {$packageSlug}");
+$testingLibrary = askWithOptions(
+    'Which testing library do you want to use?',
+    ['pest', 'phpunit'],
+    'pest',
+);
+
+$codeStyleLibrary = askWithOptions(
+    'Which code style library do you want to use?',
+    ['pint', 'cs fixer'],
+    'pint',
+);
 
 writeln('------');
-writeln("Author     : {$authorName} ({$authorUsername}, {$authorEmail})");
-writeln("Vendor     : {$vendorName} ({$vendorSlug})");
-writeln("Package    : {$packageSlug} <{$description}>");
-writeln("Namespace  : {$vendorNamespace}\\{$className}");
-writeln("Class name : {$className}");
+//writeln("Author     : {$authorName} ({$authorUsername}, {$authorEmail})");
+//writeln("Vendor     : {$vendorName} ({$vendorSlug})");
+//writeln("Package    : {$packageSlug} <{$description}>");
+//writeln("Namespace  : {$vendorNamespace}\\{$className}");
+//writeln("Class name : {$className}");
+writeln("Testing library : {$testingLibrary}");
+writeln("Code style library : {$codeStyleLibrary}");
 writeln('------');
 
 writeln('This script will replace the above values in all relevant files in the project directory.');
