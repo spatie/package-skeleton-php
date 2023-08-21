@@ -180,7 +180,7 @@ function setupCodeStyleLibrary(string $codeStyleLibrary): void
         );
 
         replace_in_file(__DIR__.'/composer.json', [
-            ':require_dev_codestyle' => '"laravel/pint": "^1.2"',
+            ':require_dev_codestyle' => '"laravel/pint": "^2.3"',
             ':scripts_codestyle' => '"format": "vendor/bin/pint"',
             ':plugins_testing' => '',
         ]);
