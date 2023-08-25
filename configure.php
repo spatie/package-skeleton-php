@@ -147,6 +147,7 @@ function setupTestingLibrary(string $testingLibrary): void
         ]);
     } elseif ($testingLibrary === 'phpunit') {
         unlink(__DIR__.'/tests/ExampleTestPest.php');
+        unlink(__DIR__.'/tests/ArchTest.php');
         unlink(__DIR__.'/tests/Pest.php');
         unlink(__DIR__.'/.github/workflows/run-tests-pest.yml');
 
