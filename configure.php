@@ -140,9 +140,9 @@ function setupTestingLibrary(string $testingLibrary): void
         );
 
         replace_in_file(__DIR__.'/composer.json', [
-            ':require_dev_testing' => '"pestphp/pest": "^2.0"',
+            ':require_dev_testing' => '"pestphp/pest": "^2.15"',
             ':scripts_testing' => '"test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage"',
+            "test-coverage": "vendor/bin/pest --coverage"',
             ':plugins_testing' => '"pestphp/pest-plugin": true',
         ]);
     } elseif ($testingLibrary === 'phpunit') {
@@ -162,7 +162,7 @@ function setupTestingLibrary(string $testingLibrary): void
         );
 
         replace_in_file(__DIR__.'/composer.json', [
-            ':require_dev_testing' => '"phpunit/phpunit": "^9.5"',
+            ':require_dev_testing' => '"phpunit/phpunit": "^10.3.2"',
             ':scripts_testing' => '"test": "vendor/bin/phpunit",
             "test-coverage": "vendor/bin/phpunit --coverage"',
             ':plugins_testing,' => '', // We need to remove the comma here as well, since there's nothing to add
