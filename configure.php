@@ -181,7 +181,7 @@ function setupCodeStyleLibrary(string $codeStyleLibrary): void
         );
 
         replace_in_file(__DIR__.'/composer.json', [
-            ':require_dev_codestyle' => '"laravel/pint": "^2.3"',
+            ':require_dev_codestyle' => '"laravel/pint": "^1.0"',
             ':scripts_codestyle' => '"format": "vendor/bin/pint"',
             ':plugins_testing' => '',
         ]);
@@ -196,7 +196,7 @@ function setupCodeStyleLibrary(string $codeStyleLibrary): void
         );
 
         replace_in_file(__DIR__.'/composer.json', [
-            ':require_dev_codestyle' => '"friendsofphp/php-cs-fixer": "^3.13"',
+            ':require_dev_codestyle' => '"friendsofphp/php-cs-fixer": "^3.21.1"',
             ':scripts_codestyle' => '"format": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --allow-risky=yes"',
             ':plugins_testing' => '',
         ]);
