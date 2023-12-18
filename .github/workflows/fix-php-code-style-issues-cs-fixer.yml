@@ -1,6 +1,9 @@
 name: Check & fix styling
 
-on: [push]
+on:
+  push:
+    paths:
+      - '**.php'
 
 permissions:
   contents: write
@@ -8,6 +11,7 @@ permissions:
 jobs:
   php-cs-fixer:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - name: Checkout code
