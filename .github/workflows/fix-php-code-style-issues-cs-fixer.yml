@@ -1,6 +1,9 @@
 name: Check & fix styling
 
-on: [push]
+on:
+  push:
+    paths:
+      - '**.php'
 
 permissions:
   contents: write
