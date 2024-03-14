@@ -140,7 +140,7 @@ function setupTestingLibrary(string $testingLibrary): void
         );
 
         replace_in_file(__DIR__.'/composer.json', [
-            ':require_dev_testing' => '"pestphp/pest": "^2.15"',
+            ':require_dev_testing' => '"pestphp/pest": "^2.20"',
             ':scripts_testing' => '"test": "vendor/bin/pest",
             "test-coverage": "vendor/bin/pest --coverage"',
             ':plugins_testing' => '"pestphp/pest-plugin": true',
