@@ -1,13 +1,33 @@
-.idea
+# Composer Related
+composer.lock
+/vendor
+
+# Frontend Assets
+/node_modules
+
+# Logs
+npm-debug.log
+yarn-error.log
+
+# Caches
+.phpunit.cache
+.phpunit.result.cache
+/build
+
+# Editors
+/.idea
+/.fleet
+/.vscode
+
+# Code sniffer
 .php_cs
 .php_cs.cache
-.phpunit.cache
-build
-composer.lock
-coverage
-docs
-phpunit.xml
-psalm.xml
-vendor
 .php-cs-fixer.cache
 
+# Misc
+phpunit.xml
+phpstan.neon
+psalm.xml
+testbench.yaml
+/docs
+/coverage
