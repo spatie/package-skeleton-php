@@ -60,7 +60,7 @@ function writeln(string $line): void
 
 function run(string $command): string
 {
-    return trim(shell_exec($command));
+    return trim(shell_exec($command) ?? '');
 }
 
 function str_after(string $subject, string $search): string
@@ -209,7 +209,7 @@ $authorName = ask('Author name', $gitName);
 $gitEmail = run('git config user.email');
 $authorEmail = ask('Author email', $gitEmail);
 
-$usernameGuess = explode(':', run('git config remote.origin.url'))[1];
+$usernameGuess = explode(':', run('git config remote.origin.url'))[1] ?? '';
 $usernameGuess = dirname($usernameGuess);
 $usernameGuess = basename($usernameGuess);
 $authorUsername = ask('Author username', $usernameGuess);
