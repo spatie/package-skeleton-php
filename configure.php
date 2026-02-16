@@ -440,5 +440,4 @@ confirm('Let this script delete itself?', true) && unlink(__FILE__);
 
 writeln('');
 writeln(green(bold('  ✨ You\'re all set! Happy building!')));
-writeln(dim('  Need help creating a package? Check out https://laravelpackage.training'));
 writeln('');
