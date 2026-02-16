@@ -1,9 +1,66 @@
 #!/usr/bin/env php
 <?php
 
+function supportsAnsi(): bool
+{
+    if (getenv('NO_COLOR') !== false) {
+        return false;
+    }
+
+    if (PHP_OS_FAMILY === 'Windows') {
+        return (function_exists('sapi_windows_vt100_support')
+            && sapi_windows_vt100_support(STDOUT))
+            || getenv('ANSICON') !== false
+            || getenv('ConEmuANSI') === 'ON'
+            || str_starts_with((string) getenv('TERM'), 'xterm');
+    }
+
+    return stream_isatty(STDOUT);
+}
+
+function ansi(string $text, string $code): string
+{
+    if (! supportsAnsi()) {
+        return $text;
+    }
+
+    return "\033[{$code}m{$text}\033[0m";
+}
+
+function bold(string $text): string
+{
+    return ansi($text, '1');
+}
+
+function dim(string $text): string
+{
+    return ansi($text, '2');
+}
+
+function green(string $text): string
+{
+    return ansi($text, '32');
+}
+
+function yellow(string $text): string
+{
+    return ansi($text, '33');
+}
+
+function writeln(string $line): void
+{
+    echo $line.PHP_EOL;
+}
+
 function ask(string $question, string $default = ''): string
 {
-    $answer = readline($question.($default ? " ({$default})" : null).': ');
+    $prompt = bold($question);
+
+    if ($default) {
+        $prompt .= ' '.dim("({$default})");
+    }
+
+    $answer = readline('  '.$prompt.': ');
 
     if (! $answer) {
         return $default;
@@ -30,7 +87,7 @@ function askWithOptions(string $question, array $options, string $default = ''):
             break;
         }
 
-        writeln(PHP_EOL."Please pick one of the following options: {$validOptions}");
+        writeln(PHP_EOL."  Please pick one of the following options: {$validOptions}");
 
         $answer = ask("{$question} ({$suggestions})");
     }
@@ -44,18 +101,13 @@ function askWithOptions(string $question, array $options, string $default = ''):
 
 function confirm(string $question, bool $default = false): bool
 {
-    $answer = ask($question.' ('.($default ? 'Y/n' : 'y/N').')');
+    $answer = ask($question.' '.($default ? 'Y/n' : 'y/N'));
 
     if (! $answer) {
         return $default;
     }
 
     return strtolower($answer) === 'y';
-}
-
-function writeln(string $line): void
-{
-    echo $line.PHP_EOL;
 }
 
 function run(string $command): string
@@ -108,19 +160,50 @@ function removeReadmeParagraphs(string $file): void
     );
 }
 
-function determineSeparator(string $path): string
+function normalizePath(string $path): string
 {
     return str_replace('/', DIRECTORY_SEPARATOR, $path);
 }
 
-function replaceForWindows(): array
+function getFilesWithPlaceholders(): array
 {
-    return preg_split('/\\r\\n|\\r|\\n/', run('dir /S /B * | findstr /v /i .git\ | findstr /v /i vendor | findstr /v /i '.basename(__FILE__).' | findstr /r /i /M /F:/ ":author :vendor :package VendorName skeleton vendor_name vendor_slug author@domain.com"'));
-}
+    $directory = new RecursiveDirectoryIterator(__DIR__, RecursiveDirectoryIterator::SKIP_DOTS);
+    $iterator = new RecursiveIteratorIterator($directory);
 
-function replaceForAllOtherOSes(): array
-{
-    return explode(PHP_EOL, run('grep -E -r -l -i ":author|:vendor|:package|VendorName|skeleton|vendor_name|vendor_slug|author@domain.com" --exclude-dir=vendor ./* ./.github/* | grep -v '.basename(__FILE__)));
+    $skipDirs = ['.git', 'vendor', 'node_modules'];
+    $scriptBasename = basename(__FILE__);
+    $placeholders = [':author', ':vendor', ':package', 'VendorName', 'skeleton', 'Skeleton', 'vendor_name', 'vendor_slug', 'author@domain.com'];
+
+    $files = [];
+
+    foreach ($iterator as $file) {
+        if (! $file->isFile()) {
+            continue;
+        }
+
+        $path = $file->getPathname();
+        $relativePath = str_replace(__DIR__.DIRECTORY_SEPARATOR, '', $path);
+
+        foreach ($skipDirs as $skipDir) {
+            if (str_starts_with($relativePath, $skipDir.DIRECTORY_SEPARATOR)) {
+                continue 2;
+            }
+        }
+
+        if ($file->getBasename() === $scriptBasename) {
+            continue;
+        }
+
+        $contents = file_get_contents($path);
+        foreach ($placeholders as $placeholder) {
+            if (stripos($contents, $placeholder) !== false) {
+                $files[] = $path;
+                break;
+            }
+        }
+    }
+
+    return $files;
 }
 
 function setupTestingLibrary(string $testingLibrary): void
@@ -203,6 +286,45 @@ function setupCodeStyleLibrary(string $codeStyleLibrary): void
     }
 }
 
+writeln('');
+
+$logoLines = [
+    '  ███████ ██████   █████  ████████ ████ ████████',
+    '  ██      ██   ██ ██   ██    ██     ██  ██',
+    '  ███████ ██████  ███████    ██     ██  ██████',
+    '       ██ ██      ██   ██    ██     ██  ██',
+    '  ███████ ██      ██   ██    ██    ████ ████████',
+];
+
+$gradientColors = [
+    '38;2;100;200;225',
+    '38;2;62;170;200',
+    '38;2;35;140;175',
+    '38;2;25;117;147',
+    '38;2;15;90;115',
+];
+
+foreach ($logoLines as $i => $line) {
+    writeln(supportsAnsi() ? "\033[{$gradientColors[$i]}m{$line}\033[0m" : $line);
+}
+
+writeln('');
+
+if (supportsAnsi()) {
+    writeln("  \033[48;2;25;117;147m\033[97m ✦ PHP Package Skeleton :: spatie.be ✦ \033[0m");
+} else {
+    writeln('  ✦ PHP Package Skeleton :: spatie.be ✦');
+}
+
+writeln('');
+writeln('  Thanks for using the Spatie PHP package skeleton!');
+writeln('  Let\'s get your new package configured.');
+writeln('');
+
+writeln(bold('  Author'));
+writeln(dim('  Used for composer.json credits and the README.'));
+writeln('');
+
 $gitName = run('git config user.name');
 $authorName = ask('Author name', $gitName);
 
@@ -214,10 +336,21 @@ $usernameGuess = dirname($usernameGuess);
 $usernameGuess = basename($usernameGuess);
 $authorUsername = ask('Author username', $usernameGuess);
 
+writeln('');
+writeln(bold('  Vendor'));
+writeln(dim('  The vendor is your brand on Packagist, e.g. in spatie/ray the vendor is "spatie".'));
+writeln('');
+
 $vendorName = ask('Vendor name', $authorUsername);
 $vendorSlug = slugify($vendorName);
+writeln('');
+writeln(dim('  The PHP namespace prefix for your package, e.g. Spatie\\Ray.'));
 $vendorNamespace = ucwords($vendorName);
 $vendorNamespace = ask('Vendor namespace', $vendorNamespace);
+
+writeln('');
+writeln(bold('  Package'));
+writeln('');
 
 $currentDirectory = getcwd();
 $folderName = basename($currentDirectory);
@@ -229,35 +362,47 @@ $className = title_case($packageName);
 $className = ask('Class name', $className);
 $description = ask('Package description', "This is my package {$packageSlug}");
 
+writeln('');
+writeln(bold('  Tooling'));
+writeln('');
+
+writeln(dim('  Pest is a testing framework with a focus on simplicity. PHPUnit is the classic choice.'));
 $testingLibrary = askWithOptions(
     'Which testing library do you want to use?',
     ['pest', 'phpunit'],
     'pest',
 );
 
+writeln('');
+writeln(dim('  Pint is Laravel\'s opinionated code formatter. CS Fixer offers more configuration options.'));
 $codeStyleLibrary = askWithOptions(
     'Which code style library do you want to use?',
     ['pint', 'cs fixer'],
     'pint',
 );
 
-writeln('------');
-writeln("Author     : {$authorName} ({$authorUsername}, {$authorEmail})");
-writeln("Vendor     : {$vendorName} ({$vendorSlug})");
-writeln("Package    : {$packageSlug} <{$description}>");
-writeln("Namespace  : {$vendorNamespace}\\{$className}");
-writeln("Class name : {$className}");
-writeln("Testing library : {$testingLibrary}");
-writeln("Code style library : {$codeStyleLibrary}");
-writeln('------');
-
-writeln('This script will replace the above values in all relevant files in the project directory.');
+writeln('');
+writeln(bold('  Summary'));
+writeln('');
+writeln("  Author      {$authorName} ({$authorUsername}, {$authorEmail})");
+writeln("  Vendor      {$vendorName} ({$vendorSlug})");
+writeln("  Package     {$packageSlug}");
+writeln("  Description {$description}");
+writeln("  Namespace   {$vendorNamespace}\\{$className}");
+writeln("  Class       {$className}");
+writeln('');
+writeln('  Tooling');
+writeln("  Testing     {$testingLibrary}");
+writeln("  Code style  {$codeStyleLibrary}");
+writeln('');
 
 if (! confirm('Modify files?', true)) {
     exit(1);
 }
 
-$files = (str_starts_with(strtoupper(PHP_OS), 'WIN') ? replaceForWindows() : replaceForAllOtherOSes());
+writeln('');
+
+$files = getFilesWithPlaceholders();
 
 foreach ($files as $file) {
     replace_in_file($file, [
@@ -274,15 +419,26 @@ foreach ($files as $file) {
     ]);
 
     match (true) {
-        str_contains($file, determineSeparator('src/SkeletonClass.php')) => rename($file, determineSeparator('./src/'.$className.'Class.php')),
+        str_contains($file, normalizePath('src/SkeletonClass.php')) => rename($file, normalizePath('./src/'.$className.'Class.php')),
         str_contains($file, 'README.md') => removeReadmeParagraphs($file),
-        default => [],
+        default => null,
     };
 }
 
+writeln(green('  ✓ Updated '.count($files).' files'));
+
 setupTestingLibrary($testingLibrary);
+writeln(green("  ✓ Configured {$testingLibrary} for testing"));
+
 setupCodeStyleLibrary($codeStyleLibrary);
+writeln(green("  ✓ Configured {$codeStyleLibrary} for code style"));
 
-confirm('Execute `composer install` and run tests?') && run('composer install && composer test');
+confirm('Execute `composer install` and run tests?', true) && run('composer install && composer test');
 
+writeln('');
 confirm('Let this script delete itself?', true) && unlink(__FILE__);
+
+writeln('');
+writeln(green(bold('  ✨ You\'re all set! Happy building!')));
+writeln(dim('  Need help creating a package? Check out https://laravelpackage.training'));
+writeln('');
