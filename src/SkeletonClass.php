@@ -2,4 +2,6 @@
 
 namespace VendorName\Skeleton;
 
-class SkeletonClass {}
+class SkeletonClass
+{
+}
