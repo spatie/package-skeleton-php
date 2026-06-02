@@ -1,7 +1,7 @@
 # :package_description
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/:vendor_slug/:package_slug.svg?style=flat-square)](https://packagist.org/packages/:vendor_slug/:package_slug)
-[![Tests](https://img.shields.io/github/actions/workflow/status/:vendor_slug/:package_slug/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/:vendor_slug/:package_slug/actions/workflows/run-tests.yml)
+[![Tests](https://github.com/spatie/package-skeleton-php/actions/workflows/run-tests-pest.yml/badge.svg)](https://github.com/:vendor_slug/:package_slug/actions/workflows/run-tests.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/:vendor_slug/:package_slug.svg?style=flat-square)](https://packagist.org/packages/:vendor_slug/:package_slug)
 <!--delete-->
 ---
